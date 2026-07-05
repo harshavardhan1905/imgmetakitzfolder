@@ -1,0 +1,230 @@
+/* Client.css */
+
+.editor-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.editor-card {
+  background-color: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 32px;
+  box-shadow: var(--shadow);
+  text-align: left;
+  width: 100%;
+}
+
+/* Increased max-width to accommodate side-by-side layout */
+.wide-card {
+  max-width: 1000px;
+}
+
+.editor-header {
+  text-align: center;
+  margin-bottom: 32px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 24px;
+}
+
+.editor-header h2 {
+  margin-top: 0;
+  margin-bottom: 8px;
+  font-size: 28px;
+}
+
+.editor-subtitle {
+  color: var(--text);
+  font-size: 15px;
+  margin: 0;
+}
+
+/* CSS Grid for side-by-side layout */
+.editor-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: start;
+}
+
+.section-divider {
+  margin: 24px 0 16px;
+}
+
+.section-divider h3 {
+  font-family: var(--proxima-nova-heading, system-ui, sans-serif);
+  color: var(--text-h);
+  font-size: 18px;
+  margin: 0;
+  border-bottom: 2px solid var(--border);
+  padding-bottom: 8px;
+  display: inline-block;
+}
+
+.map-header p {
+  font-size: 13px;
+  color: var(--text);
+  margin: 8px 0 0;
+}
+
+/* Sticky right panel setup */
+.sticky-wrapper {
+  position: sticky;
+  top: 24px; /* Sticks 24px from the top of the viewport when scrolling */
+}
+
+.map-container-style {
+  height: 350px;
+  width: 100%;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  z-index: 10; /* Ensures Leaflet map stays in bounds */
+}
+
+.coordinates-row {
+  display: flex;
+  gap: 16px;
+}
+
+.coordinates-row .form-group {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+/* Form Styles */
+.form-group {
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-family: var(--proxima-nova-heading, system-ui, sans-serif);
+  font-weight: 600;
+  color: var(--text-h);
+  margin-bottom: 6px;
+  font-size: 14px;
+}
+
+.hidden-input {
+  display: none;
+}
+
+.file-upload-label {
+  cursor: pointer;
+  display: block;
+}
+
+.file-upload-box {
+  border: 2px dashed var(--border);
+  border-radius: 8px;
+  padding: 32px 20px;
+  text-align: center;
+  background-color: var(--code-bg);
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.file-upload-label:hover .file-upload-box {
+  border-color: var(--accent);
+  background-color: var(--accent-bg);
+}
+
+.file-icon {
+  font-size: 24px;
+}
+
+.file-text {
+  color: var(--text-h);
+  font-weight: 500;
+  font-size: 15px;
+  word-break: break-all;
+}
+
+.text-input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background-color: var(--bg);
+  color: var(--text-h);
+  font-family: inherit;
+  font-size: 14px;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.text-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-bg);
+}
+
+.text-input::placeholder {
+  color: var(--text);
+  opacity: 0.5;
+}
+
+.read-only {
+  background-color: var(--code-bg);
+  color: var(--text);
+  cursor: not-allowed;
+}
+
+.read-only:focus {
+  border-color: var(--border);
+  box-shadow: none;
+}
+
+.submit-button {
+  width: 100%;
+  padding: 14px 24px;
+  margin-top: 24px;
+  background-color: var(--accent);
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter 0.2s ease, transform 0.1s ease;
+  font-family: inherit;
+}
+
+.submit-button:hover:not(:disabled) {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.submit-button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.submit-button:disabled {
+  background-color: var(--border);
+  color: var(--text);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 900px) {
+  .editor-grid {
+    grid-template-columns: 1fr; /* Stacks panels on smaller screens */
+    gap: 32px;
+  }
+  
+  .sticky-wrapper {
+    position: relative;
+    top: 0;
+  }
+}
