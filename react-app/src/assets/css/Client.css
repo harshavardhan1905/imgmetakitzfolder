@@ -10,24 +10,22 @@
 }
 
 .editor-card {
-  background-color: var(--bg);
-  border: 1px solid var(--border);
+  background-color: var(--bg, #ffffff);
   border-radius: 12px;
   padding: 32px;
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow, 0 4px 12px rgba(0, 0, 0, 0.1));
   text-align: left;
   width: 100%;
 }
 
-/* Increased max-width to accommodate side-by-side layout */
 .wide-card {
-  max-width: 1000px;
+  max-width: 1200px;
 }
 
 .editor-header {
   text-align: center;
   margin-bottom: 32px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--border, #eaeaea);
   padding-bottom: 24px;
 }
 
@@ -38,12 +36,11 @@
 }
 
 .editor-subtitle {
-  color: var(--text);
+  color: var(--text, #666);
   font-size: 15px;
   margin: 0;
 }
 
-/* CSS Grid for side-by-side layout */
 .editor-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -57,24 +54,198 @@
 
 .section-divider h3 {
   font-family: var(--proxima-nova-heading, system-ui, sans-serif);
-  color: var(--text-h);
+  color: var(--text-h, #333);
   font-size: 18px;
   margin: 0;
-  border-bottom: 2px solid var(--border);
+  border-bottom: 2px solid var(--border, #eaeaea);
   padding-bottom: 8px;
   display: inline-block;
 }
 
 .map-header p {
   font-size: 13px;
-  color: var(--text);
+  color: var(--text, #666);
   margin: 8px 0 0;
 }
 
-/* Sticky right panel setup */
 .sticky-wrapper {
   position: sticky;
-  top: 24px; /* Sticks 24px from the top of the viewport when scrolling */
+  top: 24px;
+}
+
+/* --- NEW: UPLOAD SECTION UI --- */
+.upload-section {
+  display: flex;
+  gap: 16px;
+  align-items: stretch;
+  margin-bottom: 16px;
+}
+
+.file-upload-label {
+  cursor: pointer;
+  flex: 1;
+}
+
+.file-upload-box {
+  border: 2px dashed var(--border, #ccc);
+  border-radius: 8px;
+  padding: 24px 16px;
+  text-align: center;
+  background-color: var(--code-bg, #f9f9f9);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.file-upload-label:hover .file-upload-box {
+  border-color: var(--accent, #007bff);
+  background-color: var(--accent-bg, #eef5ff);
+}
+
+.file-icon {
+  font-size: 32px;
+}
+
+.file-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+}
+
+.upload-title {
+  color: var(--text-h, #333);
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.upload-subtitle {
+  color: var(--text, #666);
+  font-size: 13px;
+  word-break: break-all;
+}
+
+/* --- NEW: IMAGE PREVIEW UI --- */
+.image-preview-container {
+  width: 120px;
+  min-width: 120px;
+  border-radius: 8px;
+  border: 2px solid var(--border, #eaeaea);
+  overflow: hidden;
+  background-color: #f1f1f1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.image-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* --- NEW: 2 COLUMN FORM ROW --- */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-group {
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-family: var(--proxima-nova-heading, system-ui, sans-serif);
+  font-weight: 600;
+  color: var(--text-h, #333);
+  margin-bottom: 6px;
+  font-size: 14px;
+}
+
+.hidden-input {
+  display: none;
+}
+
+.text-input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--border, #ccc);
+  border-radius: 6px;
+  background-color: var(--bg, #fff);
+  color: var(--text-h, #333);
+  font-family: inherit;
+  font-size: 14px;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.text-input:focus {
+  outline: none;
+  border-color: var(--accent, #007bff);
+  box-shadow: 0 0 0 3px var(--accent-bg, rgba(0, 123, 255, 0.25));
+}
+
+.text-input::placeholder {
+  color: var(--text, #999);
+  opacity: 0.7;
+}
+
+.read-only {
+  background-color: var(--code-bg, #f5f5f5);
+  color: var(--text, #666);
+  cursor: not-allowed;
+}
+
+.read-only:focus {
+  border-color: var(--border, #ccc);
+  box-shadow: none;
+}
+
+/* --- NEW: MAP SEARCH CONTROLS --- */
+.map-search-controls {
+  display: flex;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.search-input {
+  flex: 1;
+}
+
+.map-btn {
+  background-color: var(--bg, #fff);
+  border: 1px solid var(--border, #ccc);
+  border-radius: 6px;
+  padding: 0 16px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.map-btn:hover {
+  background-color: var(--code-bg, #f5f5f5);
+  border-color: var(--accent, #007bff);
+}
+
+.live-btn {
+  background-color: var(--accent-bg, #eef5ff);
+  color: var(--accent, #007bff);
+  border-color: var(--accent, #007bff);
+}
+
+.live-btn:hover {
+  background-color: var(--accent, #007bff);
+  color: #fff;
 }
 
 .map-container-style {
@@ -83,8 +254,8 @@
   margin-bottom: 20px;
   border-radius: 8px;
   overflow: hidden;
-  border: 1px solid var(--border);
-  z-index: 10; /* Ensures Leaflet map stays in bounds */
+  border: 1px solid var(--border, #ccc);
+  z-index: 10;
 }
 
 .coordinates-row {
@@ -97,99 +268,11 @@
   margin-bottom: 0;
 }
 
-/* Form Styles */
-.form-group {
-  margin-bottom: 16px;
-  display: flex;
-  flex-direction: column;
-}
-
-.form-group label {
-  font-family: var(--proxima-nova-heading, system-ui, sans-serif);
-  font-weight: 600;
-  color: var(--text-h);
-  margin-bottom: 6px;
-  font-size: 14px;
-}
-
-.hidden-input {
-  display: none;
-}
-
-.file-upload-label {
-  cursor: pointer;
-  display: block;
-}
-
-.file-upload-box {
-  border: 2px dashed var(--border);
-  border-radius: 8px;
-  padding: 32px 20px;
-  text-align: center;
-  background-color: var(--code-bg);
-  transition: all 0.2s ease;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-}
-
-.file-upload-label:hover .file-upload-box {
-  border-color: var(--accent);
-  background-color: var(--accent-bg);
-}
-
-.file-icon {
-  font-size: 24px;
-}
-
-.file-text {
-  color: var(--text-h);
-  font-weight: 500;
-  font-size: 15px;
-  word-break: break-all;
-}
-
-.text-input {
-  width: 100%;
-  padding: 10px 14px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background-color: var(--bg);
-  color: var(--text-h);
-  font-family: inherit;
-  font-size: 14px;
-  box-sizing: border-box;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.text-input:focus {
-  outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-bg);
-}
-
-.text-input::placeholder {
-  color: var(--text);
-  opacity: 0.5;
-}
-
-.read-only {
-  background-color: var(--code-bg);
-  color: var(--text);
-  cursor: not-allowed;
-}
-
-.read-only:focus {
-  border-color: var(--border);
-  box-shadow: none;
-}
-
 .submit-button {
   width: 100%;
   padding: 14px 24px;
   margin-top: 24px;
-  background-color: var(--accent);
+  background-color: var(--accent, #007bff);
   color: #ffffff;
   border: none;
   border-radius: 6px;
@@ -210,8 +293,8 @@
 }
 
 .submit-button:disabled {
-  background-color: var(--border);
-  color: var(--text);
+  background-color: var(--border, #ccc);
+  color: var(--text, #999);
   cursor: not-allowed;
   opacity: 0.7;
 }
@@ -219,12 +302,71 @@
 /* Mobile Responsiveness */
 @media (max-width: 900px) {
   .editor-grid {
-    grid-template-columns: 1fr; /* Stacks panels on smaller screens */
+    grid-template-columns: 1fr;
     gap: 32px;
   }
-  
+
   .sticky-wrapper {
     position: relative;
     top: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}
+
+/* Guide Step Styling */
+.guide-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+  margin: 24px 0;
+}
+
+.step-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background-color: var(--accent-bg, #eef5ff);
+  color: var(--accent, #007bff);
+  font-size: 24px;
+  font-weight: 700;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.step-details h3 {
+  margin: 0 0 8px 0;
+  font-size: 20px;
+  color: var(--text-h, #222);
+}
+
+.step-details p {
+  margin: 0 0 12px 0;
+  color: var(--text, #555);
+  line-height: 1.6;
+}
+
+.feature-list {
+  margin: 0;
+  padding-left: 20px;
+  color: var(--text, #555);
+  line-height: 1.6;
+}
+
+.feature-list li {
+  margin-bottom: 6px;
+}
+
+@media (max-width: 600px) {
+  .guide-step {
+    flex-direction: column;
+    gap: 16px;
   }
 }

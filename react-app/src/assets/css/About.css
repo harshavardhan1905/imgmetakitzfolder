@@ -1,0 +1,113 @@
+/* About.css */
+
+.about-card {
+    max-width: 800px;
+    /* Slightly narrower than the editor for better reading readability */
+}
+
+.about-text p {
+    color: var(--text, #4a4a4a);
+    line-height: 1.7;
+    font-size: 16px;
+    margin-bottom: 16px;
+}
+
+.about-text strong {
+    color: var(--text-h, #222);
+}
+
+.author-divider {
+    margin-top: 48px;
+}
+
+/* Author Profile Card */
+.author-profile {
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+    background-color: var(--code-bg, #f9f9f9);
+    border: 1px solid var(--border, #eaeaea);
+    border-radius: 12px;
+    padding: 32px;
+    margin-top: 24px;
+}
+
+.author-image-container {
+    flex-shrink: 0;
+}
+
+.author-image {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #ffffff;
+    box-shadow: var(--shadow, 0 4px 12px rgba(0, 0, 0, 0.1));
+}
+
+.author-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.author-name {
+    margin: 0;
+    font-size: 22px;
+    color: var(--text-h, #222);
+    font-family: var(--proxima-nova-heading, system-ui, sans-serif);
+}
+
+.author-role {
+    color: var(--accent, #007bff);
+    font-weight: 600;
+    font-size: 14px;
+    margin-top: 4px;
+    margin-bottom: 12px;
+}
+
+.author-bio {
+    color: var(--text, #555);
+    line-height: 1.6;
+    font-size: 15px;
+    margin: 0 0 20px 0;
+}
+
+.author-socials {
+    display: flex;
+    gap: 16px;
+}
+
+.social-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-h, #333);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 14px;
+    padding: 8px 16px;
+    background-color: var(--bg, #fff);
+    border: 1px solid var(--border, #ddd);
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.social-link:hover {
+    border-color: var(--accent, #007bff);
+    color: var(--accent, #007bff);
+    background-color: var(--accent-bg, #eef5ff);
+}
+
+/* Mobile Responsiveness for Author Card */
+@media (max-width: 600px) {
+    .author-profile {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 24px;
+    }
+
+    .author-socials {
+        justify-content: center;
+    }
+}
