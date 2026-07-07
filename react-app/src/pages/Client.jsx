@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
+import { API_BASE_URL } from '../api';
 import '../assets/css/Client.css'; 
 
 import L from 'leaflet';
@@ -78,7 +79,7 @@ const Client = () => {
     formData.append('image', file);
 
     try {
-      const response = await fetch('http://localhost:5000/api/extract-metadata', {
+      const response = await fetch(`${API_BASE_URL}/api/extract-metadata`, {
         method: 'POST',
         body: formData,
       });
@@ -114,7 +115,7 @@ const Client = () => {
     });
 
     try {
-      const response = await fetch('http://localhost:5000/api/process-image', {
+      const response = await fetch(`${API_BASE_URL}/api/process-image`, {
         method: 'POST',
         body: formData,
       });

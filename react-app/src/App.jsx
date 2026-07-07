@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { API_BASE_URL } from './api';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'

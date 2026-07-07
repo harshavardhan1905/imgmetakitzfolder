@@ -1,118 +1,135 @@
 const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
-const { exiftool } = require('exiftool-vendored');
-const fs = require('fs'); // RESTORED: Required for file cleanup
-const path = require('path');
-const os = require('os'); // NEW: Required to find Vercel's temporary directory
+const piexif = require("piexifjs");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(cors());
 
-// THE FIX: Tell Multer to save files to Vercel's allowed temporary folder
-const upload = multer({ dest: os.tmpdir() });
+// We are back to purely using RAM! No more file system crashes.
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
-app.post('/api/extract-metadata', upload.single('image'), async (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ error: 'No image uploaded.' });
-  }
+// --- Helper function to convert GPS Coordinates for EXIF ---
+const gpsHelper = (coordinate) => {
+    const absolute = Math.abs(coordinate);
+    const degrees = Math.floor(absolute);
+    const minutesNotTruncated = (absolute - degrees) * 60;
+    const minutes = Math.floor(minutesNotTruncated);
+    const seconds = Math.floor((minutesNotTruncated - minutes) * 60 * 100);
+    return [[degrees, 1], [minutes, 1], [seconds, 100]];
+};
 
-  // Because we used os.tmpdir(), req.file.path now contains a valid, temporary file path
-  const filePath = req.file.path;
+// 1. EXTRACT METADATA
+app.post('/api/extract-metadata', upload.single('image'), (req, res) => {
+    if (!req.file) return res.status(400).json({ error: 'No image uploaded.' });
 
-  try {
-    const tags = await exiftool.read(filePath);
+    try {
+        // Read the image from RAM
+        const imgString = req.file.buffer.toString('binary');
+        const exifData = piexif.load(imgString);
 
-    const extractedData = {
-      title: tags.Title || tags.XPTitle || '',
-      subject: tags.Subject || tags.XPSubject || tags.Description || '',
-      rating: tags.Rating || '',
-      tags: Array.isArray(tags.Keywords) ? tags.Keywords.join(', ') : (tags.Keywords || tags.XPKeywords || ''),
-      comments: tags.UserComment || tags.XPComment || '',
-      authors: tags.Creator || tags.Artist || tags.XPAuthor || '',
-      copyright: tags.Copyright || '',
-      latitude: tags.GPSLatitude || 17.3850,
-      longitude: tags.GPSLongitude || 78.4867
-    };
+        // Safely extract tags (converting from binary strings to normal text)
+        const getTag = (ifd, tag) => {
+            return exifData[ifd] && exifData[ifd][tag] ? exifData[ifd][tag].toString() : '';
+        };
 
-    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+        let lat = 17.3850;
+        let lng = 78.4867;
+        
+        // Basic GPS parsing if it exists
+        if (exifData.GPS && exifData.GPS[piexif.GPSIFD.GPSLatitude]) {
+            const latRef = getTag("GPS", piexif.GPSIFD.GPSLatitudeRef) || 'N';
+            const latData = exifData.GPS[piexif.GPSIFD.GPSLatitude];
+            lat = (latData[0][0]/latData[0][1]) + (latData[1][0]/latData[1][1])/60 + (latData[2][0]/latData[2][1])/3600;
+            if (latRef === 'S') lat = lat * -1;
+        }
 
-    res.json(extractedData);
+        if (exifData.GPS && exifData.GPS[piexif.GPSIFD.GPSLongitude]) {
+            const lngRef = getTag("GPS", piexif.GPSIFD.GPSLongitudeRef) || 'E';
+            const lngData = exifData.GPS[piexif.GPSIFD.GPSLongitude];
+            lng = (lngData[0][0]/lngData[0][1]) + (lngData[1][0]/lngData[1][1])/60 + (lngData[2][0]/lngData[2][1])/3600;
+            if (lngRef === 'W') lng = lng * -1;
+        }
 
-  } catch (error) {
-    console.error("Error extracting metadata:", error);
-    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-    res.status(500).json({ error: 'Failed to extract metadata.' });
-  }
+        const extractedData = {
+            title: getTag("0th", piexif.ImageIFD.ImageDescription),
+            subject: getTag("0th", piexif.ImageIFD.ImageDescription), 
+            rating: '', 
+            tags: getTag("0th", piexif.ImageIFD.Software), // Often used as a fallback for tags in piexif
+            comments: getTag("Exif", piexif.ExifIFD.UserComment),
+            authors: getTag("0th", piexif.ImageIFD.Artist),
+            copyright: getTag("0th", piexif.ImageIFD.Copyright),
+            latitude: lat,
+            longitude: lng
+        };
+
+        res.json(extractedData);
+    } catch (error) {
+        console.error("Error extracting metadata:", error);
+        res.status(500).json({ error: 'Failed to extract metadata. Ensure it is a valid JPEG.' });
+    }
 });
 
-app.post('/api/process-image', upload.single('image'), async (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ error: 'No image uploaded.' });
-  }
+// 2. PROCESS AND WRITE METADATA
+app.post('/api/process-image', upload.single('image'), (req, res) => {
+    if (!req.file) return res.status(400).json({ error: 'No image uploaded.' });
 
-  const filePath = req.file.path;
-  
-  const { title, subject, rating, tags, comments, authors, copyright, latitude, longitude } = req.body;
+    const { title, subject, comments, authors, copyright, latitude, longitude } = req.body;
 
-  try {
-    const now = new Date();
-    const formattedDate = now.toISOString().replace(/-/g, ':').replace('T', ' ').substring(0, 19);
+    try {
+        const imgString = req.file.buffer.toString('binary');
+        
+        // Initialize an empty EXIF object
+        const zeroth = {};
+        const exif = {};
+        const gps = {};
 
-    const tagsToWrite = {
-      Title: title || '',
-      Description: subject || '', 
-      Subject: subject || '',    
-      Rating: rating ? parseInt(rating) : 0,
-      Keywords: tags ? tags.split(',').map(tag => tag.trim()) : [], 
-      UserComment: comments || '',
-      Creator: authors || '',
-      Artist: authors || '',
-      Copyright: copyright || '',
-      GPSLatitude: latitude ? parseFloat(latitude) : undefined,
-      GPSLongitude: longitude ? parseFloat(longitude) : undefined,
-      XPTitle: title || '',
-      XPSubject: subject || '',
-      XPComment: comments || '',
-      XPAuthor: authors || '',
-      XPKeywords: tags || '',
-      DateTimeOriginal: formattedDate,
-      CreateDate: formattedDate,
-      ModifyDate: formattedDate,
-    };
+        // Map your React data to standard EXIF tags
+        if (title || subject) zeroth[piexif.ImageIFD.ImageDescription] = title || subject;
+        if (authors) zeroth[piexif.ImageIFD.Artist] = authors;
+        if (copyright) zeroth[piexif.ImageIFD.Copyright] = copyright;
+        if (comments) exif[piexif.ExifIFD.UserComment] = comments;
 
-    await exiftool.write(filePath, tagsToWrite);
+        // Map GPS Data
+        if (latitude && longitude) {
+            const latFloat = parseFloat(latitude);
+            const lngFloat = parseFloat(longitude);
+            
+            gps[piexif.GPSIFD.GPSLatitudeRef] = latFloat >= 0 ? "N" : "S";
+            gps[piexif.GPSIFD.GPSLatitude] = gpsHelper(latFloat);
+            
+            gps[piexif.GPSIFD.GPSLongitudeRef] = lngFloat >= 0 ? "E" : "W";
+            gps[piexif.GPSIFD.GPSLongitude] = gpsHelper(lngFloat);
+        }
 
-    res.download(filePath, `optimized_${req.file.originalname}`, (err) => {
-      if (err) {
-        console.error("Error sending file:", err);
-      }
-      
-      try {
-        if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-        if (fs.existsSync(`${filePath}_original`)) fs.unlinkSync(`${filePath}_original`);
-      } catch (cleanupError) {
-        console.error("Error cleaning up files:", cleanupError);
-      }
-    });
+        // Generate the new EXIF string
+        const exifObj = { "0th": zeroth, "Exif": exif, "GPS": gps };
+        const exifBytes = piexif.dump(exifObj);
+        
+        // Insert it into the image
+        const newImgString = piexif.insert(exifBytes, imgString);
+        
+        // Convert back to a buffer and send to frontend
+        const newImgBuffer = Buffer.from(newImgString, 'binary');
 
-  } catch (error) {
-    console.error("Error processing metadata:", error);
-    res.status(500).json({ error: 'Failed to process image metadata.' });
-    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-  }
-});
+        res.set({
+            'Content-Type': 'image/jpeg',
+            'Content-Disposition': `attachment; filename="optimized_${req.file.originalname}"`
+        });
+        
+        res.send(newImgBuffer);
 
-process.on('SIGINT', () => {
-  exiftool.end().then(() => process.exit());
+    } catch (error) {
+        console.error("Error processing metadata:", error);
+        res.status(500).json({ error: 'Failed to process image metadata.' });
+    }
 });
 
 if (process.env.NODE_ENV !== 'production') {
-  app.listen(PORT, () => {
-    console.log(`Metadata server running on http://localhost:${PORT}`);
-  });
+    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 }
 
 module.exports = app;
