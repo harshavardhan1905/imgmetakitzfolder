@@ -12,7 +12,9 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 
 // Configure Multer to save uploaded files to a temporary 'uploads' directory
-const upload = multer({ dest: 'uploads/' });
+// const upload = multer({ dest: 'uploads/' });
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 // Create the uploads directory if it doesn't exist
 if (!fs.existsSync('uploads')) {
